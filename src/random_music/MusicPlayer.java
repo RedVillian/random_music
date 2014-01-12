@@ -68,16 +68,18 @@ public class MusicPlayer {
 
     public static void playSong(Synthesizer synth, Song song, Random r) throws InterruptedException {{
         int numLoops = 8;
+        int nextMeasure;
         MeasureChannel[] currMeasureChannels;
 
         while(numLoops > 0){
+            nextMeasure = r.nextInt(song.getNumMeasures());
             currMeasureChannels = song.getMeasureChannels();
-            playMeasureChannels(synth, currMeasureChannels, song.getMeasureMs(), r);
+            playMeasureChannels(synth, currMeasureChannels, song.getMeasureMs(), nextMeasure, r);
             numLoops--;
         }
     }}
 
-    private static void playMeasureChannels(Synthesizer synth, MeasureChannel[] measureChannels, int measureMs, Random r) throws InterruptedException {
+    private static void playMeasureChannels(Synthesizer synth, MeasureChannel[] measureChannels, int measureMs, int measureNum, Random r) throws InterruptedException {
         MidiChannel[] channels = synth.getChannels();
         int remainingMs = measureMs;
 
@@ -91,7 +93,7 @@ public class MusicPlayer {
 
         //Load current notes from current measure...
         for(int i = 0; i < measureChannels.length; i++){
-            for(Note n : measureChannels[i].getRandMeasure(r).getNotes()){
+            for(Note n : measureChannels[i].getMeasure(measureNum).getNotes()){
                 //Set the channel not will play on and calculate the total milleseconds it will be on
                 n.setChannelNum(i).setChannelMs(measureMs);
                 currentNoteQueues[i].add(n);
@@ -166,14 +168,11 @@ public class MusicPlayer {
     static void playNote(Synthesizer synth, Note n, int measureMs, int channel) throws InterruptedException {
         int ms = getNoteTime(n.getLength(), measureMs);
         if(n.isRest()){
-            System.out.println(ms + "ms rest");
             Thread.sleep(ms);
         } else if(n.getChord() != ChordEnum.NOTE){
-            System.out.println("Chord: " + n.getTone() + " for " + ms + "ms");
             playMidiNote(synth, n.getTone(), ms, channel, n.getChord());
 
         }else{
-            System.out.println("Tone: " + n.getTone() + " for " + ms + "ms");
             playMidiNote(synth, n.getTone(), ms, channel, n.getChord());
         }
     }
@@ -194,29 +193,15 @@ public class MusicPlayer {
         if(!note.isRest()){
             for(int n : note.getChord().getNotes()){
                 channels[note.getChannelNum()].noteOn((note.getTone() + n), volume);
-
-                //debug reporting
-                if(note.getChord() != ChordEnum.NOTE){
-                    System.out.print("Chord ");
-                }
-                System.out.print(note.getTone() + ", ");
             }
-            System.out.println("on.");
         }
     }
 
     private static void noteOff(MidiChannel[] channels, Note note) {
         if(!note.isRest()){
-            //TODO: remove debug reporting
-            if(note.getChord() != ChordEnum.NOTE){
-                System.out.print("Chord ");
-            }
             for(int n : note.getChord().getNotes()){
                 channels[note.getChannelNum()].noteOff((note.getTone() + n));
-
-                System.out.print((note.getTone()+n) + ", ");
             }
-            System.out.println("on.");
         }
     }
 

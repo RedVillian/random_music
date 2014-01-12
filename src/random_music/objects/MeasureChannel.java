@@ -45,7 +45,7 @@ public class MeasureChannel {
         return getMeasure(r.nextInt(measures.length));
     }
 
-    private Measure getMeasure(int i) {
+    public Measure getMeasure(int i) {
         return measures[i];
     }
 }

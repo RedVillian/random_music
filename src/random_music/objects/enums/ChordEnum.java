@@ -21,4 +21,8 @@ public enum ChordEnum {
     public int[] getNotes() {
         return notes;
     }
+
+    public int get(int i) {
+        return notes[i];
+    }
 }

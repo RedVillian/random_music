@@ -1,5 +1,7 @@
 package random_music.objects.options;
 
+import random_music.objects.Note;
+
 /**
  * Created with IntelliJ IDEA.
  * User: jelms
@@ -8,12 +10,13 @@ package random_music.objects.options;
  * To change this template use File | Settings | File Templates.
  */
 public class MeasureOptions {
-    int restChance = 10;
-    int repeatChance = 50;
-    int secondaryChance = 5;
-    int primaryChance = 45;
+    private int restChance = 10;
+    private int repeatChance = 50;
+    private int secondaryChance = 5;
+    private int primaryChance = 45;
+    private Note[] primaryNotes;
 
-    int chordChance = 100;
+    private int chordChance = 100;
     private TimingOptions timingOptions = new TimingOptions();
     private int volume;
 
@@ -83,5 +86,13 @@ public class MeasureOptions {
 
     public int getVolume() {
         return volume;
+    }
+
+    public Note[] getPrimaryNotes() {
+        return primaryNotes;
+    }
+
+    public void setPrimaryNotes(Note[] primaryNotes) {
+        this.primaryNotes = primaryNotes;
     }
 }

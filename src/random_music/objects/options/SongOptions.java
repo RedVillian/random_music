@@ -105,4 +105,8 @@ public class SongOptions {
         setRootPitch(this.rootPitch + (octaveOffset * ScaleEnum.STEPS_IN_OCTAVE));
         return this;
     }
+
+    public boolean isMajor(){
+        return scale.isMajor();
+    }
 }

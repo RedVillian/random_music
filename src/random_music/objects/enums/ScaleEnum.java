@@ -1,5 +1,11 @@
 package random_music.objects.enums;
 
+import random_music.objects.Song;
+import random_music.objects.options.MeasureOptions;
+import random_music.objects.options.SongOptions;
+
+import java.util.Random;
+
 /**
  * Created with IntelliJ IDEA.
  * User: jelms
@@ -13,6 +19,8 @@ public enum ScaleEnum {
 
     public static final int STEPS_IN_OCTAVE = 12;
     public static final int NOTES_IN_SCALE = 7;
+    private static final boolean WANT_MAJOR = true;
+    private static final boolean WANT_MINOR = false;
 
     private final int[] steps;
     private boolean isMajor;
@@ -105,5 +113,33 @@ public enum ScaleEnum {
 
     public boolean isMajor() {
         return isMajor;
+    }
+
+    public int getNextScaleStep(SongOptions songOptions, MeasureOptions options, int lastTone, Random r) {
+        int maxRandNoRest = options.getTotalChance() - options.getRestChance();
+        int runningChance = 0;
+        int nextStep = 0;
+        boolean isRising = Song.RISING;
+
+        //TODO: implement songOptions to dictate variations
+
+        if(r.nextInt(maxRandNoRest) < (runningChance -= options.getRepeatChance())){
+            return lastTone;
+        }else if(r.nextInt(maxRandNoRest) < (runningChance -= options.getSecondaryChance())){
+            nextStep = getNextProgressionStep(songOptions, WANT_MINOR, r);
+        }else {
+            nextStep = getNextProgressionStep(songOptions, WANT_MAJOR, r);
+        }
+
+        //50% chance of a falling step
+        if(r.nextBoolean()){
+            isRising = Song.FALLING;
+        }
+
+        return nearestNote(nextStep, lastTone, isRising);
+    }
+
+    private int getNextProgressionStep(SongOptions songOptions, boolean majorOrMinor, Random r) {
+        return songOptions.getProgression().getRand(r, majorOrMinor).getNum();
     }
 }

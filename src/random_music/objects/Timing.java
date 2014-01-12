@@ -19,7 +19,7 @@ public class Timing {
     private static final int REGULAR_TIMES_PERCENT = 10;
     private static final boolean ACCELERATION = true;
     private static final boolean DECELERATION = false;
-    private static final int SPEED_CHANGE_MOD = 1;
+    private static final double SPEED_CHANGE_MOD = .5;
     NoteLengthEnum[] times;
 
     public Timing(TimingOptions options, int maxTime, int speedPercent, Random r) {
@@ -129,7 +129,7 @@ public class Timing {
         } else {
             chance = 50 - speedPercent;
         }
-        return MusicPlayer.sanitizePercent(chance * SPEED_CHANGE_MOD);
+        return MusicPlayer.sanitizePercent((int)(chance * SPEED_CHANGE_MOD));
     }
 
     private NoteLengthEnum[] generateRegularTimes(TimeSignatureEnum timeSignature) {
