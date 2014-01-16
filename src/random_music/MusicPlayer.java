@@ -19,12 +19,15 @@ import java.util.Random;
  */
 public class MusicPlayer {
 
+    static int debugNoteCounter = 0;
+
     private static final int VOLUME = 150;
 
     public static void main(String [ ] args)
     {
         long seed = System.currentTimeMillis();
 //        seed = 1389844077887L;
+//        seed = 1389851011566L;
         System.err.println("This seed is: " + seed);
         Random r = new Random(seed);
         try {
@@ -36,13 +39,14 @@ public class MusicPlayer {
             options.setRootPitch(80);
             options.setComplexityPercent(20);
             options.setNumMeasures(4);
+            options.setMeasureMs(3000);
             playSong(synth, new Song(options, r), r);
 
             Thread.sleep(1000);
 
             options.setRootPitch(50);
             options.setScale(ScaleEnum.MINOR);
-            options.setMeasureMs(5000);
+            options.setMeasureMs(4000);
             options.setComplexityPercent(50);
             playSong(synth, new Song(options, r), r);
 
@@ -83,7 +87,7 @@ public class MusicPlayer {
     private static void playAllMeasureChannels(MidiChannel[] midiChannels, MeasureChannel[][] allMeasures, int measureMs) throws InterruptedException {
         int minWaitingMs = measureMs;
         int measuresRemaining = allMeasures.length;
-        int remainingMs = measureMs;
+        int remainingMs = measureMs * allMeasures.length;
         int numChannels = allMeasures[0].length;
 
         Queue<Note> offNotes = new LinkedList<Note>();
@@ -161,9 +165,8 @@ public class MusicPlayer {
 
             //decrement remaining ms in the measure and prep minWaitingMs for next iteration
             remainingMs -= minWaitingMs;
-            minWaitingMs = remainingMs;
+            minWaitingMs = measureMs;
         }
-        remainingMs = measureMs;
     }
 
     private static void playMeasureChannels(Synthesizer synth, MeasureChannel[] measureChannels, int measureMs, int measureNum, Random r) throws InterruptedException {
@@ -184,7 +187,8 @@ public class MusicPlayer {
         } else {
             note = Integer.toString(currNote.getTone());
         }
-        System.out.println(note + " for " + currNote.getChannelMs() + "ms");
+        debugNoteCounter++;
+        System.out.println(debugNoteCounter + ": " + note + " for " + currNote.getChannelMs() + "ms");
     }
 
 //    public static void playMeasure(Synthesizer synth, Measure measure, int measureMs, Random r) throws InterruptedException {

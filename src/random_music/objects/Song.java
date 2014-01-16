@@ -16,7 +16,6 @@ import java.util.Random;
  * To change this template use File | Settings | File Templates.
  */
 public class Song {
-
     private static final double CHORD_COMPLEX_MOD = 1.5;//chords are twice as likely as other complexity-based components
 
     SongOptions songOptions;
