@@ -11,8 +11,6 @@ import random_music.objects.enums.NoteLengthEnum;
  * To change this template use File | Settings | File Templates.
  */
 public class Note {
-    public static final boolean NOT_REST = false;
-    public static final boolean IS_REST = true;
 
     int tone;
     NoteLengthEnum length;
@@ -71,5 +69,10 @@ public class Note {
 
     public void decrementChannelMs(int msWaited) {
         setChannelMs(channelMs - msWaited);
+    }
+
+
+    public void setTone(int tone) {
+        this.tone = tone;
     }
 }

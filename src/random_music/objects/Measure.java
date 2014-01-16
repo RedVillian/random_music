@@ -1,5 +1,7 @@
 package random_music.objects;
 
+import random_music.Constants;
+
 /**
  * Created with IntelliJ IDEA.
  * User: jelms
@@ -16,5 +18,11 @@ public class Measure {
 
     public Note[] getNotes() {
         return notes;
+    }
+
+    public void transposeNotes(int octaveOffset) {
+        for(Note n : notes){
+            n.setTone(n.getTone() + (octaveOffset * Constants.STEPS_IN_OCTAVE));
+        }
     }
 }

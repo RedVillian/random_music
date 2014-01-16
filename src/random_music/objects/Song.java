@@ -1,5 +1,6 @@
 package random_music.objects;
 
+import random_music.Constants;
 import random_music.MusicPlayer;
 import random_music.objects.enums.*;
 import random_music.objects.options.MeasureOptions;
@@ -15,12 +16,8 @@ import java.util.Random;
  * To change this template use File | Settings | File Templates.
  */
 public class Song {
-    public static final boolean RISING = true;
-    public static final boolean FALLING = true;
 
-    public static final int NUM_NOTES_IN_MEASURE = 32;
     private static final double CHORD_COMPLEX_MOD = 1.5;//chords are twice as likely as other complexity-based components
-    public static final int PERCENT = 100;
 
     SongOptions songOptions;
     MeasureOptions defaultMeasureOptions;
@@ -158,10 +155,10 @@ public class Song {
             noteTone = elligibleNotes[0].getTone();
         }else if(chance < (runningChance+=options.getRepeatChance())){
             //repeat last note with new duration
-            note = new Note(lastNote.getTone(), Note.NOT_REST, noteLength);
+            note = new Note(lastNote.getTone(), Constants.NOT_REST, noteLength);
         } else if( chance < (runningChance+=options.getRestChance())){
             //insert a rest with new duration
-            return new Note(lastNote.getTone(), Note.IS_REST, noteLength);
+            return new Note(lastNote.getTone(), Constants.IS_REST, noteLength);
         } else {
             noteTone = randTone(elligibleNotes, r);
         }
@@ -179,7 +176,7 @@ public class Song {
 //        }
 
         if(null == note){
-            note = new Note(noteTone, Note.NOT_REST, noteLength);
+            note = new Note(noteTone, Constants.NOT_REST, noteLength);
         }
 
         //Handle chords

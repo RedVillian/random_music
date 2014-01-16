@@ -31,6 +31,9 @@ public class MeasureChannel {
 
     public void setMeasures(Measure[] measures) {
         this.measures = measures;
+        for(Measure measure : this.measures){
+            measure.transposeNotes(range.getOctaveOffset());
+        }
     }
 
     public MeasureOptions getMeasureUpdates() {

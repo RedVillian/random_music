@@ -1,5 +1,6 @@
 package random_music.objects;
 
+import random_music.Constants;
 import random_music.MusicPlayer;
 import random_music.objects.enums.NoteLengthEnum;
 import random_music.objects.enums.TimeSignatureEnum;
@@ -28,7 +29,7 @@ public class Timing {
 
     private NoteLengthEnum[] generateTimes(TimeSignatureEnum timeSignature, int maxTime, int speedPercent, Random r) {
         //modify the percent "roll" assuming an average percentage of 50
-        int percent = MusicPlayer.sanitizePercent(r.nextInt(Song.PERCENT) * (speedPercent/(Song.PERCENT/2)));
+        int percent = MusicPlayer.sanitizePercent(r.nextInt(Constants.PERCENT) * (speedPercent/(Constants.PERCENT/2)));
 
         if(percent < (REGULAR_TIMES_PERCENT)){
             return generateRegularTimes(timeSignature);
@@ -52,7 +53,7 @@ public class Timing {
         try{
             while (remaining > 0.0){
                 int roll;
-                if((roll = r.nextInt(Song.PERCENT)) < fasterChance){
+                if((roll = r.nextInt(Constants.PERCENT)) < fasterChance){
                     //TODO: Remove debug text
                     System.out.println("Attempt to accelerate with a roll of " + roll + " under " + fasterChance);
                     //attempt to speed up by a non-dotted type (ergo the 2)
@@ -60,7 +61,7 @@ public class Timing {
                     if(currBeat != lastBeat){
                         System.out.println("      ...success");
                     }
-                } else if((roll = r.nextInt(Song.PERCENT)) < slowerChance) {
+                } else if((roll = r.nextInt(Constants.PERCENT)) < slowerChance) {
                     System.out.println("Attempt to decelerate with a roll of " + roll + " under " + slowerChance);
                     //attempt to slow down by a non-dotted type (ergo the 2)
                     currBeat = shiftNoteLength(lastBeat, remaining, -2);
@@ -71,6 +72,7 @@ public class Timing {
                     currBeat = lastBeat;
                 }
                 times.add(currBeat);
+                System.out.println(currBeat);
                 remaining -= currBeat.getRatio();
                 lastBeat = currBeat;
             }

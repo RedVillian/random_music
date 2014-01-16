@@ -1,6 +1,6 @@
 package random_music.objects.enums;
 
-import random_music.objects.Song;
+import random_music.Constants;
 import random_music.objects.options.MeasureOptions;
 import random_music.objects.options.SongOptions;
 
@@ -17,8 +17,6 @@ public enum ScaleEnum {
     MAJOR(2,2,1,2,2,2,1,true),
     MINOR(2,1,2,2,1,2,2,false);
 
-    public static final int STEPS_IN_OCTAVE = 12;
-    public static final int NOTES_IN_SCALE = 7;
     private static final boolean WANT_MAJOR = true;
     private static final boolean WANT_MINOR = false;
 
@@ -26,7 +24,7 @@ public enum ScaleEnum {
     private boolean isMajor;
 
     ScaleEnum(int ii, int iii, int iv, int v, int vi, int vii, int i, boolean isMajor){
-        this.steps = new int[NOTES_IN_SCALE];
+        this.steps = new int[Constants.NOTES_IN_SCALE];
         steps[0] = ii;
         steps[1] = iii;
         steps[2] = iv;
@@ -39,8 +37,8 @@ public enum ScaleEnum {
     }
 
     public static int nearestNote(int noteNum, int lastNote, boolean isRising) {
-        int lastNoteNum = lastNote % NOTES_IN_SCALE;
-        int lastNoteOctave = lastNote / NOTES_IN_SCALE;
+        int lastNoteNum = lastNote % Constants.NOTES_IN_SCALE;
+        int lastNoteOctave = lastNote / Constants.NOTES_IN_SCALE;
 
         int octaveShift = 0;
 
@@ -54,7 +52,7 @@ public enum ScaleEnum {
             }
         }
 
-        int nextNote = ((lastNoteOctave + octaveShift) * NOTES_IN_SCALE) + noteNum;
+        int nextNote = ((lastNoteOctave + octaveShift) * Constants.NOTES_IN_SCALE) + noteNum;
 
         return nextNote;
     }
@@ -70,8 +68,8 @@ public enum ScaleEnum {
     }
 
     int getPositive(int i){
-        int octaveOffset = i/NOTES_IN_SCALE;
-        int mod = i%NOTES_IN_SCALE;
+        int octaveOffset = i/ Constants.NOTES_IN_SCALE;
+        int mod = i% Constants.NOTES_IN_SCALE;
         int noteOffset = 0;
 
         if(mod > 0){
@@ -85,12 +83,12 @@ public enum ScaleEnum {
             }
         }
 
-        return (octaveOffset*STEPS_IN_OCTAVE) + noteOffset;
+        return (octaveOffset* Constants.STEPS_IN_OCTAVE) + noteOffset;
     }
 
     int getNegative(int i){
-        int octaveOffset = i/NOTES_IN_SCALE;
-        int mod = i%NOTES_IN_SCALE;
+        int octaveOffset = i/ Constants.NOTES_IN_SCALE;
+        int mod = i% Constants.NOTES_IN_SCALE;
         int noteOffset = 0;
 
         if(mod > 0){
@@ -104,7 +102,7 @@ public enum ScaleEnum {
             }
         }
 
-        return -(octaveOffset*STEPS_IN_OCTAVE) - noteOffset;
+        return -(octaveOffset* Constants.STEPS_IN_OCTAVE) - noteOffset;
     }
 
     public int[] getSteps() {
@@ -119,7 +117,7 @@ public enum ScaleEnum {
         int maxRandNoRest = options.getTotalChance() - options.getRestChance();
         int runningChance = 0;
         int nextStep = 0;
-        boolean isRising = Song.RISING;
+        boolean isRising = Constants.RISING;
 
         //TODO: implement songOptions to dictate variations
 
@@ -133,7 +131,7 @@ public enum ScaleEnum {
 
         //50% chance of a falling step
         if(r.nextBoolean()){
-            isRising = Song.FALLING;
+            isRising = Constants.FALLING;
         }
 
         return nearestNote(nextStep, lastTone, isRising);

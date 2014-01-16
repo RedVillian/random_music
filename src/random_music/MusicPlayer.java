@@ -1,7 +1,6 @@
 package random_music;
 
 import random_music.objects.*;
-import random_music.objects.enums.ChordEnum;
 import random_music.objects.enums.NoteLengthEnum;
 import random_music.objects.enums.ScaleEnum;
 import random_music.objects.options.SongOptions;
@@ -24,16 +23,16 @@ public class MusicPlayer {
 
     public static void main(String [ ] args)
     {
-        long seed = System.currentTimeMillis();
+        long seed = 1389844077887L;//System.currentTimeMillis();
         System.err.println("This seed is: " + seed);
         Random r = new Random(seed);
         try {
             Synthesizer synth = getSingleSynthesizer();
             synth.open();
-            clearSynthBuffer(synth);
+//            clearSynthBuffer(synth);
             SongOptions options = new SongOptions();
 
-            options.setRootPitch(100);
+            options.setRootPitch(80);
             options.setComplexityPercent(20);
             options.setNumMeasures(4);
             playSong(synth, new Song(options, r), r);
@@ -42,7 +41,7 @@ public class MusicPlayer {
 
             options.setRootPitch(50);
             options.setScale(ScaleEnum.MINOR);
-            options.setMeasureMs(3000);
+            options.setMeasureMs(5000);
             options.setComplexityPercent(50);
             playSong(synth, new Song(options, r), r);
 
@@ -58,9 +57,9 @@ public class MusicPlayer {
         }
     }
 
-    private static void clearSynthBuffer(Synthesizer synth) throws InterruptedException {
-        playNote(synth, new Note(0, Note.IS_REST, NoteLengthEnum.QUARTER), 100, 0);
-    }
+//    private static void clearSynthBuffer(Synthesizer synth) throws InterruptedException {
+//        playNote(synth, new Note(0, Note.IS_REST, NoteLengthEnum.QUARTER), 100, 0);
+//    }
 
     public static Synthesizer getSingleSynthesizer() throws MidiUnavailableException {
         return MidiSystem.getSynthesizer();
@@ -126,8 +125,11 @@ public class MusicPlayer {
                     if(currNote.getChannelMs() <= minWaitingMs){
                         //Remove the head and queue it for noteOff...
                         offNotes.add(nQ.remove());
-                        //...and peek at the next note and queue it for noteOn
-                        onNotes.add(nQ.peek());
+                        //if there's another note
+                        if(nQ.size() > 0){
+                            //...and peek at the next note and queue it for noteOn
+                            onNotes.add(nQ.peek());
+                        }
                         //For all other notes...
                     } else {
                         //...reduce their remaining wait
@@ -146,6 +148,7 @@ public class MusicPlayer {
             //...and noteOn new
             while(onNotes.size() > 0){
                 Note currNote = onNotes.remove();
+                printNote(currNote);
                 if(null != currNote){
                     noteOn(channels, currNote);
                 }
@@ -157,36 +160,46 @@ public class MusicPlayer {
         }
     }
 
-    public static void playMeasure(Synthesizer synth, Measure measure, int measureMs, Random r) throws InterruptedException {
-        for(Note n : measure.getNotes()){
-
-            playNote(synth, n, measureMs, 0);
-            //TODO: Staccato?
+    private static void printNote(Note currNote) {
+        String note;
+        if(currNote.isRest()){
+            note = "rest";
+        } else {
+            note = Integer.toString(currNote.getTone());
         }
+        System.out.println(note + " for " + currNote.getChannelMs() + "ms");
     }
 
-    static void playNote(Synthesizer synth, Note n, int measureMs, int channel) throws InterruptedException {
-        int ms = getNoteTime(n.getLength(), measureMs);
-        if(n.isRest()){
-            Thread.sleep(ms);
-        } else if(n.getChord() != ChordEnum.NOTE){
-            playMidiNote(synth, n.getTone(), ms, channel, n.getChord());
+//    public static void playMeasure(Synthesizer synth, Measure measure, int measureMs, Random r) throws InterruptedException {
+//        for(Note n : measure.getNotes()){
+//
+//            playNote(synth, n, measureMs, 0);
+//            //TODO: Staccato?
+//        }
+//    }
 
-        }else{
-            playMidiNote(synth, n.getTone(), ms, channel, n.getChord());
-        }
-    }
+//    static void playNote(Synthesizer synth, Note n, int measureMs, int channel) throws InterruptedException {
+//        int ms = getNoteTime(n.getLength(), measureMs);
+//        if(n.isRest()){
+//            Thread.sleep(ms);
+//        } else if(n.getChord() != ChordEnum.NOTE){
+//            playMidiNote(synth, n.getTone(), ms, channel, n.getChord());
+//
+//        }else{
+//            playMidiNote(synth, n.getTone(), ms, channel, n.getChord());
+//        }
+//    }
 
-    public static void playMidiNote(Synthesizer synth, int pitch, int length, int channel, ChordEnum chord) throws InterruptedException {
-        MidiChannel[] channels = synth.getChannels();
-        for(int note : chord.getNotes()){
-            channels[channel].noteOn((pitch + note), VOLUME);
-        }
-        Thread.sleep(length);
-        for(int note : chord.getNotes()){
-            channels[channel].noteOff((pitch + note));
-        }
-    }
+//    public static void playMidiNote(Synthesizer synth, int pitch, int length, int channel, ChordEnum chord) throws InterruptedException {
+//        MidiChannel[] channels = synth.getChannels();
+//        for(int note : chord.getNotes()){
+//            channels[channel].noteOn((pitch + note), VOLUME);
+//        }
+//        Thread.sleep(length);
+//        for(int note : chord.getNotes()){
+//            channels[channel].noteOff((pitch + note));
+//        }
+//    }
 
     private static void noteOn(MidiChannel[] channels, Note note) {
         int volume = VOLUME;
@@ -210,6 +223,6 @@ public class MusicPlayer {
     }
 
     public static int sanitizePercent(int percent) {
-        return Math.max(Math.min(percent, Song.PERCENT), 0);
+        return Math.max(Math.min(percent, Constants.PERCENT), 0);
     }
 }

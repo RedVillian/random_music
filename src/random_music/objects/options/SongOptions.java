@@ -1,6 +1,6 @@
 package random_music.objects.options;
 
-import random_music.objects.Song;
+import random_music.Constants;
 import random_music.objects.enums.ProgressionEnum;
 import random_music.objects.enums.ScaleEnum;
 
@@ -13,7 +13,7 @@ import random_music.objects.enums.ScaleEnum;
  */
 public class SongOptions {
     private int rootPitch = 60;
-    private int measureMs = 992;
+    private int measureMs = 4000;
     private ScaleEnum scale = ScaleEnum.MAJOR;
     private ProgressionEnum progression = ProgressionEnum.MAJOR_FULL;
     private int numMeasures = 2;
@@ -47,7 +47,7 @@ public class SongOptions {
 
     public SongOptions setMeasureMs(int measureMs) {
         //ensure that total measure time is always evenly divisible by the number of notes in the measure
-        this.measureMs = measureMs - (measureMs % Song.NUM_NOTES_IN_MEASURE);
+        this.measureMs = measureMs - (measureMs % Constants.NUM_NOTES_IN_MEASURE);
         return this;
     }
 
@@ -102,7 +102,7 @@ public class SongOptions {
     }
 
     public SongOptions shiftRootPitch(int octaveOffset) {
-        setRootPitch(this.rootPitch + (octaveOffset * ScaleEnum.STEPS_IN_OCTAVE));
+        setRootPitch(this.rootPitch + (octaveOffset * Constants.STEPS_IN_OCTAVE));
         return this;
     }
 
