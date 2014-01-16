@@ -23,7 +23,8 @@ public class MusicPlayer {
 
     public static void main(String [ ] args)
     {
-        long seed = 1389844077887L;//System.currentTimeMillis();
+        long seed = System.currentTimeMillis();
+//        seed = 1389844077887L;
         System.err.println("This seed is: " + seed);
         Random r = new Random(seed);
         try {
@@ -66,47 +67,51 @@ public class MusicPlayer {
     }
 
     public static void playSong(Synthesizer synth, Song song, Random r) throws InterruptedException {{
-        int numLoops = 8;
-        int nextMeasure;
+        int numMeasures = 8;
         MeasureChannel[] currMeasureChannels;
 
-        while(numLoops > 0){
-            nextMeasure = r.nextInt(song.getNumMeasures());
-            currMeasureChannels = song.getMeasureChannels();
-            playMeasureChannels(synth, currMeasureChannels, song.getMeasureMs(), nextMeasure, r);
-            numLoops--;
-        }
+        MidiChannel[] midiChannels = synth.getChannels();
+        MeasureChannel[][] allMeasures = song.getMeasureChannels(numMeasures, r);
+
+        playAllMeasureChannels(midiChannels, allMeasures, song.getMeasureMs());
+
+//TODO: probably deprecated
+//        currMeasureChannels = song.getMeasureChannels();
+//        playMeasureChannels(synth, currMeasureChannels, song.getMeasureMs(), nextMeasure, r);
     }}
 
-    private static void playMeasureChannels(Synthesizer synth, MeasureChannel[] measureChannels, int measureMs, int measureNum, Random r) throws InterruptedException {
-        MidiChannel[] channels = synth.getChannels();
+    private static void playAllMeasureChannels(MidiChannel[] midiChannels, MeasureChannel[][] allMeasures, int measureMs) throws InterruptedException {
+        int minWaitingMs = measureMs;
+        int measuresRemaining = allMeasures.length;
         int remainingMs = measureMs;
+        int numChannels = allMeasures[0].length;
 
-        //TODO: randomize measures within each measureChannel?
+        Queue<Note> offNotes = new LinkedList<Note>();
+        Queue<Note> onNotes = new LinkedList<Note>();
 
         Queue<Note>[] currentNoteQueues;
-        currentNoteQueues = new Queue[measureChannels.length];
+        currentNoteQueues = new Queue[allMeasures[0].length];
         for(int i = 0; i < currentNoteQueues.length; i++){
             currentNoteQueues[i] = new LinkedList<Note>();
         }
 
-        //Load current notes from current measure...
-        for(int i = 0; i < measureChannels.length; i++){
-            for(Note n : measureChannels[i].getMeasure(measureNum).getNotes()){
-                //Set the channel not will play on and calculate the total milleseconds it will be on
-                n.setChannelNum(i).setChannelMs(measureMs);
-                currentNoteQueues[i].add(n);
+        //for each measure to be played
+        for(int measureNum = 0; measureNum < measuresRemaining; measureNum++){
+            //Load current notes from current measure...
+            for(int channelNum = 0; channelNum < numChannels; channelNum++){
+                for(Note n : allMeasures[measureNum][channelNum].getMeasure(0).getNotes()){
+                    //Set the channel not will play on and calculate the total milleseconds it will be on
+                    n.setChannelNum(channelNum).setChannelMs(measureMs);
+                    currentNoteQueues[channelNum].add(n);
+                }
             }
         }
 
         //Initial noteOns...
         for(Queue<Note> q : currentNoteQueues){
-            noteOn(channels, q.remove());
+            noteOn(midiChannels, q.remove());
         }
 
-        int minWaitingMs = measureMs;
-        Queue<Note> offNotes = new LinkedList<Note>();
-        Queue<Note> onNotes = new LinkedList<Note>();
         //for the rest of the measure...
         while(remainingMs > 0){
             //Find the minimum time until change
@@ -143,14 +148,14 @@ public class MusicPlayer {
 
             //noteOff expiring notes
             while(offNotes.size() > 0){
-                noteOff(channels, offNotes.remove());
+                noteOff(midiChannels, offNotes.remove());
             }
             //...and noteOn new
             while(onNotes.size() > 0){
                 Note currNote = onNotes.remove();
                 printNote(currNote);
                 if(null != currNote){
-                    noteOn(channels, currNote);
+                    noteOn(midiChannels, currNote);
                 }
             }
 
@@ -158,6 +163,18 @@ public class MusicPlayer {
             remainingMs -= minWaitingMs;
             minWaitingMs = remainingMs;
         }
+        remainingMs = measureMs;
+    }
+
+    private static void playMeasureChannels(Synthesizer synth, MeasureChannel[] measureChannels, int measureMs, int measureNum, Random r) throws InterruptedException {
+
+
+        //TODO: randomize measures within each measureChannel?
+
+
+
+
+
     }
 
     private static void printNote(Note currNote) {

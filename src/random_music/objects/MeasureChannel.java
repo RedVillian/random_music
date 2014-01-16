@@ -29,10 +29,22 @@ public class MeasureChannel {
         songUpdates.shiftRootPitch(range.getOctaveOffset());
     }
 
+    public MeasureChannel(MeasureChannel toCopy) {
+        MeasureChannel newCopy = new MeasureChannel(toCopy.range, toCopy.songUpdates, toCopy.measureUpdates);
+        newCopy.setMeasures(toCopy.getMeasures());
+        newCopy.setInstrument(toCopy.getInstrument());
+    }
+
     public void setMeasures(Measure[] measures) {
         this.measures = measures;
-        for(Measure measure : this.measures){
-            measure.transposeNotes(range.getOctaveOffset());
+    }
+
+    public void setMeasuresTransposed(Measure[] measures) {
+        this.measures = measures;
+        if(null != range){
+            for(Measure measure : this.measures){
+                measure.transposeNotes(range.getOctaveOffset());
+            }
         }
     }
 
@@ -50,5 +62,17 @@ public class MeasureChannel {
 
     public Measure getMeasure(int i) {
         return measures[i];
+    }
+
+    public Measure[] getMeasures() {
+        return measures;
+    }
+
+    public Instrument getInstrument() {
+        return instrument;
+    }
+
+    public void setInstrument(Instrument instrument) {
+        this.instrument = instrument;
     }
 }

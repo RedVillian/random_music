@@ -49,7 +49,7 @@ public class Song {
         Note[][] measuresChords = getMeasuresChords(songOptions, defaultMeasureOptions, r);
 
         for(int i = 0; i < mChannels.length; i++) {
-            mChannels[i].setMeasures(generateMeasures(mChannels[i].getSongUpdates(), mChannels[i].getMeasureUpdates(), measuresChords, r));
+            mChannels[i].setMeasuresTransposed(generateMeasures(mChannels[i].getSongUpdates(), mChannels[i].getMeasureUpdates(), measuresChords, r));
         }
 
         return mChannels;
@@ -213,5 +213,19 @@ public class Song {
 
     public int getNumMeasures() {
         return songOptions.getNumMeasures();
+    }
+
+    public MeasureChannel[][] getMeasureChannels(int numMeasuresToPlay, Random r) {
+        MeasureChannel[][] allChannels = new MeasureChannel[numMeasuresToPlay][];
+        int nextMeasureNum = 0;
+        for(int i = 0; i < allChannels.length; i++){
+            nextMeasureNum = r.nextInt(this.getNumMeasures());
+            allChannels[i] = new MeasureChannel[measureChannels.length];
+            for(int j = 0; j < measureChannels.length; j++){
+                allChannels[i][j] = new MeasureChannel(measureChannels[j]);
+                allChannels[i][j].setMeasures(new Measure[]{measureChannels[j].measures[nextMeasureNum]});
+            }
+        }
+        return allChannels;
     }
 }
